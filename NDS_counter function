@@ -1,0 +1,36 @@
+def NDS_counter(N,D,dist):
+    import numpy as np
+    #N = number of observations
+    #D = number of dimensions
+    #dist = 0 for uniform distribution
+    #dist = 1 for normal distribution
+    
+    
+    #FOR UNIFORM DISTRIBUTION
+    if dist == 0:    
+        solutions = np.zeros((N,D))
+        for d in range(0,D):
+            solutions[:,d] = np.random.random(N)
+        
+    #FOR NORMAL DRIBUTION
+    if dist == 1:    
+        solutions = np.zeros((N,D))
+        for d in range(0,D):
+            solutions[:,d] = np.random.normal(loc=0.0, scale=1.0, size=N)
+        
+    
+    #count non-dominated solutions 
+    #initial = np.zeros((1,D))
+    non_dominated_set = np.reshape(solutions[0,:], ((1,D)))
+    for i in range(1,N):
+        comparison = solutions[i,:] > non_dominated_set
+        if all(np.sum(comparison,axis=1)>=1):
+            #improves on at least one objective for all solutions  
+            #completely better
+            inf_loc = [np.squeeze(np.where(np.sum(comparison,axis=1)==D))]
+            if len(inf_loc):
+                non_dominated_set = np.delete(non_dominated_set, inf_loc,0)
+            #add to non dom set
+            non_dominated_set = np.concatenate((non_dominated_set, [solutions[i,:]]), axis=0)
+    
+    return(non_dominated_set, len(non_dominated_set)) 
